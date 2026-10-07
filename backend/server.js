@@ -82,7 +82,11 @@ const connectWithFallback = async () => {
     console.log('🔄 Launching embedded In-Memory MongoDB Server fallback...');
     try {
       const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongod = await MongoMemoryServer.create();
+      const mongod = await MongoMemoryServer.create({
+        binary: {
+          version: '7.0.5',
+        },
+      });
       const memUri = mongod.getUri();
       await mongoose.connect(memUri);
       console.log('✅ Connected to In-Memory MongoDB instance successfully!');
