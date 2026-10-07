@@ -1,0 +1,22 @@
+{
+  "name": "ecommerce",
+  "version": "1.0.0",
+  "description": "Full-stack MERN E-Commerce Application",
+  "main": "backend/server.js",
+  "scripts": {
+    "install-deps": "npm install --prefix backend && npm install --prefix frontend",
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/server.js",
+    "seed": "npm run seed --prefix backend"
+  },
+  "keywords": [
+    "mern",
+    "ecommerce",
+    "express",
+    "react",
+    "mongodb",
+    "node"
+  ],
+  "author": "selva5067",
+  "license": "ISC"
+}
