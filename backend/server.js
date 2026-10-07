@@ -68,20 +68,34 @@ const autoSeedIfEmpty = async () => {
 };
 
 // Database Connection & Server Start
-mongoose
-  .connect(MONGO_URI)
-  .then(async () => {
-    console.log('✅ Connected to MongoDB');
-    await autoSeedIfEmpty();
-    app.listen(PORT, () => {
-      console.log(`🚀 MERN Express Server listening on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB Connection Error:', err.message);
-    console.log('⚠️ Running Server with fallback / listening on PORT...');
-    app.listen(PORT, () => {
-      console.log(`🚀 MERN Express Server listening on http://localhost:${PORT}`);
-    });
+const connectWithFallback = async () => {
+  try {
+    const uri = process.env.MONGO_URI;
+    if (uri) {
+      await mongoose.connect(uri);
+      console.log('✅ Connected to MongoDB Atlas / Remote Database');
+    } else {
+      throw new Error('MONGO_URI environment variable is not set.');
+    }
+  } catch (err) {
+    console.warn('⚠️ MongoDB Primary Connection Warning:', err.message);
+    console.log('🔄 Launching embedded In-Memory MongoDB Server fallback...');
+    try {
+      const { MongoMemoryServer } = require('mongodb-memory-server');
+      const mongod = await MongoMemoryServer.create();
+      const memUri = mongod.getUri();
+      await mongoose.connect(memUri);
+      console.log('✅ Connected to In-Memory MongoDB instance successfully!');
+    } catch (memErr) {
+      console.error('❌ In-Memory Mongo fallback error:', memErr.message);
+    }
+  }
+
+  await autoSeedIfEmpty();
+  app.listen(PORT, () => {
+    console.log(`🚀 MERN Express Server listening on port ${PORT}`);
   });
+};
+
+connectWithFallback();
 
